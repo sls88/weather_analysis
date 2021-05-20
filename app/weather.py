@@ -2,7 +2,6 @@ import csv
 import os
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
-from pathlib import Path
 from typing import List, Tuple
 from zipfile import ZipFile
 
@@ -12,9 +11,11 @@ import pandas as pd
 # from geopy import Here
 # from geopy.adapters import AioHTTPAdapter
 # from geopy.geocoders import Nominatim
+from geopy import Here
 from pandas import DataFrame
 
 import treat
+import save
 
 
 class Data:
@@ -23,7 +24,7 @@ class Data:
     path_inp = 'D:\\weather_analysis\\test\\test_dir\\'
     path_out = 'D:\\weather_analysis\\test\\test_dir\\'
     api_key_forecast = "653e3ab3208c8cb799cce402dd5d7580"
-    api_key_geoloc = 'zMvc4lJQRalNBC7yf3x2lXqlwTCM93jLCaCK4nm89cU'
+    api_key_geoloc = 'AIsAcdZVazJaI7CcQ4MRG_Cab9mqLsqkw_0OP9gtw8Y'
 
 
 @contextmanager
@@ -74,9 +75,9 @@ def coord_validator(coords: Tuple[str, str]) -> bool:
 
 def args_parser() -> Tuple[str, int, str]:
     parser = argparse.ArgumentParser(description='Weather analysis.')
-    parser.add_argument('path_input', type=Path,
+    parser.add_argument('path_input', type=str,
                         help='path to directory with input data')
-    parser.add_argument('path_output', type=Path,
+    parser.add_argument('path_output', type=str,
                         help='path to the directory for the output')
     parser.add_argument('threads', type=int,
                         help='number of threads for parallel data processing')
@@ -96,10 +97,9 @@ def get_correct_df() -> DataFrame:
 
 
 def get_address(latitude: float, longitude: float) -> str:
-    pass
-    # geolocator = Here(apikey=Data.api_key_geoloc) #, adapter_factory=AioHTTPAdapter
-    # coord_str = str(latitude)+", "+str(longitude)
-    # return str(geolocator.reverse(coord_str))
+    geolocator = Here(apikey=Data.api_key_geoloc) #, adapter_factory=AioHTTPAdapter
+    coord_str = str(latitude)+", "+str(longitude)
+    return str(geolocator.reverse(coord_str))
 
 
 def get_list_addresses(df2: DataFrame) -> List[str]:
@@ -135,18 +135,18 @@ def select_main_cities(df: DataFrame) -> DataFrame:
     return df2.copy()
 
 
-def add_geo_address(df2: DataFrame) -> None:
+def add_geo_address(df2: DataFrame) -> DataFrame:
     df2.loc[:, "Geo_address"] = get_list_addresses(df2)
     df2 = df2[["Name", "Geo_address", "Country", "City", "Latitude", "Longitude"]]
     get_cities_centre(df2)
+    return df2
 
 
 if __name__ == "__main__":
     args = args_parser()
-    Data.path_inp = str(args[0]) + "\\"
+    Data.path_inp = str(args[0])
     Data.threads = int(args[2])
     Data.path_out = str(args[1])
-    add_geo_address(select_main_cities(get_correct_df()))
-    print(len(Data.centres))
-    print(Data.centres)
-    treat.save_hist_graphics(Data.centres)
+    df = add_geo_address(select_main_cities(get_correct_df()))
+    treat.save_graphics(Data.centres)
+    save.save_hotels_inf(df)
