@@ -2,34 +2,25 @@ import csv
 import os
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from zipfile import ZipFile
 
 import argparse
 import numpy as np
 import pandas as pd
-# from geopy import Here
 # from geopy.adapters import AioHTTPAdapter
 # from geopy.geocoders import Nominatim
 from geopy import Here
 from pandas import DataFrame
 
-import treat
-import save
-
-
-class Data:
-    centres = []
-    threads = 50
-    path_inp = 'D:\\weather_analysis\\test\\test_dir\\'
-    path_out = 'D:\\weather_analysis\\test\\test_dir\\'
-    api_key_forecast = "653e3ab3208c8cb799cce402dd5d7580"
-    api_key_geoloc = 'AIsAcdZVazJaI7CcQ4MRG_Cab9mqLsqkw_0OP9gtw8Y'
+from config import Args, Config
+from postprocess import general_postprocess_func_save
+from save import save_graphics, save_hotels_inf
 
 
 @contextmanager
 def unpack_files() -> None:
-    path = Data.path_inp
+    path = Config.path_inp
     source_dir = os.listdir(path)
     list_open_files = unpack_zip(source_dir)
     try:
@@ -43,7 +34,7 @@ def unpack_files() -> None:
 
 
 def unpack_zip(source_list: List[str]) -> List[str]:
-    path = Data.path_inp
+    path = Config.path_inp
     for file in source_list:
         if file.endswith(".zip"):
             with ZipFile(path + file) as myzip:
@@ -52,7 +43,7 @@ def unpack_zip(source_list: List[str]) -> List[str]:
 
 
 def readline_gen() -> List[str]:
-    path_input = Data.path_inp
+    path_input = Config.path_inp
     source_dir = os.listdir(path_input)
     for file in source_dir:
         if file.endswith(".csv"):
@@ -97,7 +88,7 @@ def get_correct_df() -> DataFrame:
 
 
 def get_address(latitude: float, longitude: float) -> str:
-    geolocator = Here(apikey=Data.api_key_geoloc) #, adapter_factory=AioHTTPAdapter
+    geolocator = Here(apikey=Config.api_key_geoloc) #, adapter_factory=AioHTTPAdapter
     coord_str = str(latitude)+", "+str(longitude)
     return str(geolocator.reverse(coord_str))
 
@@ -105,27 +96,20 @@ def get_address(latitude: float, longitude: float) -> str:
 def get_list_addresses(df2: DataFrame) -> List[str]:
     lat = df2.Latitude.tolist()
     long = df2.Longitude.tolist()
-    with ThreadPoolExecutor(max_workers=Data.threads) as pool:
+    with ThreadPoolExecutor(max_workers=Config.threads) as pool:
         responses = pool.map(get_address, *(lat, long))
     return list(responses)
 
 
-def get_cities_centre(df2: DataFrame) -> None:
-    df_sort = df2.sort_values("City").reset_index(drop=True)
-    hotels_1_city = []
-    curr_city = (df_sort.loc[0].Country, df_sort.loc[0].City)
-    try:
-        for i in df_sort.loc:
-            if curr_city == (i.Country, i.City):
-                hotels_1_city.append((i.Latitude, i.Longitude))
-            else:
-                find_center = np.array(hotels_1_city).astype(float).mean(axis=0).tolist()
-                Data.centres.append([curr_city, find_center])
-                curr_city = (i.Country, i.City)
-                hotels_1_city = [(i.Latitude, i.Longitude)]
-    except KeyError:
-        find_center = np.array(hotels_1_city).astype(float).mean(axis=0).tolist()
-        Data.centres.append([curr_city, find_center])
+def get_cities_centre(df2: DataFrame) -> List[List[Union[Tuple[str], List[float]]]]:
+    centres = []
+    for city, group in df2.groupby("City"):
+        country = group.iloc[0].Country
+        lst = list(zip(group.Latitude.values.tolist(),
+                       group.Longitude.values.tolist()))
+        center = np.array(lst).astype(float).mean(axis=0).tolist()
+        centres.append([(country, city), center])
+    return centres
 
 
 def select_main_cities(df: DataFrame) -> DataFrame:
@@ -142,11 +126,17 @@ def add_geo_address(df2: DataFrame) -> DataFrame:
     return df2
 
 
-if __name__ == "__main__":
+def main():
     args = args_parser()
-    Data.path_inp = str(args[0])
-    Data.threads = int(args[2])
-    Data.path_out = str(args[1])
+    Config.path_inp = str(args[0])
+    Config.threads = int(args[2])
+    Config.path_out = str(args[1])
     df = add_geo_address(select_main_cities(get_correct_df()))
-    treat.save_graphics(Data.centres)
-    save.save_hotels_inf(df)
+    centres = get_cities_centre(df)
+    save_graphics(centres)
+    save_hotels_inf(df)
+    general_postprocess_func_save()
+
+
+if __name__ == "__main__":
+    main()

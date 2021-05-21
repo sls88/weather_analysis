@@ -1,14 +1,11 @@
 import json
-import os
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Tuple
 
-import matplotlib.pyplot as plt
 import requests
 
-from weather import Data
+from config import Config
 
 
 class Curr:
@@ -27,7 +24,7 @@ def set_curr_time(data_hist):
 
 
 def forecast(coords):
-    api_key = Data.api_key_forecast
+    api_key = Config.api_key_forecast
     lat, lon = coords[0], coords[1]
     url = "http://api.openweathermap.org/data/2.5/forecast"
     res = requests.get(url, params={"lat": lat,
@@ -64,7 +61,7 @@ class DayHistWeather:
         self.day_arr = None
 
     def historical_weather(self):
-        api_key = Data.api_key_forecast
+        api_key = Config.api_key_forecast
         url = "https://api.openweathermap.org/data/2.5/onecall/timemachine"
         res = requests.get(url, params={"lat": self.lat,
                                         "lon": self.lon,
@@ -118,36 +115,3 @@ def weather(coords):
     hist_arr = get_hist_array(coords, 5)
     fore_arr = forecast(coords)
     return np.concatenate((fore_arr, hist_arr))
-
-
-def save_weather(center: List) -> None:
-    city, coords = center[0], center[1]
-    path = Data.path_out
-    day_10_arr = weather(coords)
-    min_temp = day_10_arr[:, 1]
-    max_temp = day_10_arr[:, 2]
-    date_day = day_10_arr[:, 0]
-    fig, ax = plt.subplots()
-    ax.plot(date_day, min_temp, "b", label="min day temperature, C")
-    ax.plot(date_day, max_temp, "r", label="max day temperature, C")
-    plt.scatter(Curr.curr_time, Curr.temp, color='g', s=40,
-                marker='o', label=f"current temp. {Curr.temp}, C")
-    ax.grid()
-    ax.legend()
-    plt.xticks(date_day)
-    plt.xlabel('Date, 1 day')
-    plt.ylabel('Temperature, C')
-    plt.title(f'{city[1]}. Day temperature.')
-    plt.axvline(x=Curr.curr_time)
-    fig.autofmt_xdate()
-    new_path = path + city[0] + '\\' + city[1] + '\\'
-    if not os.path.isdir(new_path):
-        os.makedirs(new_path)
-    fig.savefig(new_path + f'weather_{city[1]}.png')
-
-
-def save_graphics(centres):
-    with ProcessPoolExecutor(max_workers=Data.threads) as pool:
-        responses = pool.map(save_weather, centres)
-    for _ in responses:
-        pass
