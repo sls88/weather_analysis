@@ -2,7 +2,7 @@ import csv
 import os
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
-from typing import List, Tuple, Union
+from typing import List, Tuple
 from zipfile import ZipFile
 
 import argparse
@@ -14,6 +14,7 @@ from geopy import Here
 from pandas import DataFrame
 
 from config import Args, Config
+from data import Data
 from postprocess import general_postprocess_func_save
 from save import save_graphics, save_hotels_inf
 
@@ -91,7 +92,6 @@ def get_address(latitude: float, longitude: float) -> str:
     geolocator = Here(apikey=Config.api_key_geoloc) #, adapter_factory=AioHTTPAdapter
     coord_str = str(latitude)+", "+str(longitude)
     return str(geolocator.reverse(coord_str))
-    # pass
 
 
 def get_list_addresses(df2: DataFrame) -> List[str]:
@@ -102,17 +102,14 @@ def get_list_addresses(df2: DataFrame) -> List[str]:
     return list(responses)
 
 
-Centre = List[Union[Tuple[str, str], List[float]]]
-
-
-def get_cities_centre(df2: DataFrame) -> List[Centre]:
+def get_cities_centre(df2: DataFrame) -> List[Data]:
     centres = []
     for city, group in df2.groupby("City"):
         country = group.iloc[0].Country
         lst = list(zip(group.Latitude.values.tolist(),
                        group.Longitude.values.tolist()))
         center = np.array(lst).astype(float).mean(axis=0).tolist()
-        centres.append([(country, city), center])
+        centres.append(Data(country, str(city), center[0], center[1]))
     return centres
 
 
@@ -123,11 +120,10 @@ def select_main_cities(df: DataFrame) -> DataFrame:
     return df2.copy()
 
 
-def add_geo_address(df2: DataFrame) -> DataFrame:
-    df2.loc[:, "Geo_address"] = get_list_addresses(df2)
-    df2 = df2[["Name", "Geo_address", "Country", "City", "Latitude", "Longitude"]]
-    get_cities_centre(df2)
-    return df2
+def add_geo_address(df: DataFrame) -> DataFrame:
+    df.loc[:, "Geo_address"] = get_list_addresses(df)
+    df = df[["Name", "Geo_address", "Country", "City", "Latitude", "Longitude"]]
+    return df
 
 
 def main() -> None:
@@ -137,9 +133,9 @@ def main() -> None:
     Config.path_out = str(args[1])
     df = add_geo_address(select_main_cities(get_correct_df()))
     centres = get_cities_centre(df)
-    lst_parts = save_graphics(centres)
+    lst_d_classes = save_graphics(centres)
     save_hotels_inf(df)
-    general_postprocess_func_save(lst_parts)
+    general_postprocess_func_save(lst_d_classes)
 
 
 if __name__ == "__main__":
