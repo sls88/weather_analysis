@@ -91,6 +91,7 @@ def get_address(latitude: float, longitude: float) -> str:
     geolocator = Here(apikey=Config.api_key_geoloc) #, adapter_factory=AioHTTPAdapter
     coord_str = str(latitude)+", "+str(longitude)
     return str(geolocator.reverse(coord_str))
+    # pass
 
 
 def get_list_addresses(df2: DataFrame) -> List[str]:
@@ -101,7 +102,10 @@ def get_list_addresses(df2: DataFrame) -> List[str]:
     return list(responses)
 
 
-def get_cities_centre(df2: DataFrame) -> List[List[Union[Tuple[str], List[float]]]]:
+Centre = List[Union[Tuple[str, str], List[float]]]
+
+
+def get_cities_centre(df2: DataFrame) -> List[Centre]:
     centres = []
     for city, group in df2.groupby("City"):
         country = group.iloc[0].Country
@@ -126,16 +130,16 @@ def add_geo_address(df2: DataFrame) -> DataFrame:
     return df2
 
 
-def main():
+def main() -> None:
     args = args_parser()
     Config.path_inp = str(args[0])
     Config.threads = int(args[2])
     Config.path_out = str(args[1])
     df = add_geo_address(select_main_cities(get_correct_df()))
     centres = get_cities_centre(df)
-    save_graphics(centres)
+    lst_parts = save_graphics(centres)
     save_hotels_inf(df)
-    general_postprocess_func_save()
+    general_postprocess_func_save(lst_parts)
 
 
 if __name__ == "__main__":
