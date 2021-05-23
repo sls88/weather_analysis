@@ -10,5 +10,5 @@ class Config:
 class Args:
     """Arguments from command line parsing."""
     threads = 100
-    path_inp = 'D:\\weather_analysis\\test\\test_dir\\'
-    path_out = 'D:\\weather_analysis\\test\\test_dir\\'
+    path_inp = "" #'D:\\weather_analysis\\test\\test_dir\\'
+    path_out = "" #'D:\\weather_analysis\\test\\test_dir\\'

@@ -2,6 +2,7 @@
 
 import os
 from concurrent.futures import ProcessPoolExecutor
+from os import path
 from typing import List
 
 import matplotlib.pyplot as plt
@@ -31,9 +32,8 @@ def save_hotels_inf(df2: DataFrame) -> None:
         p = len_arr // 100 + 2
         for i in range(100, p * 100, 100):
             slice_ = group.loc[i - 100: i - 1]
-            slice_.to_csv('{}.csv'.format(
-                Args.path_out + country + "\\" + city
-                + "\\" + city + f'{i}'), index=False)
+            slice_.to_csv(os.path.join(f'{Args.path_out}{country}',
+                                       f'{city}', f'{city}{i}.csv'), index=False)
 
 
 def save_weather(dcl: Data) -> Data:
@@ -50,7 +50,6 @@ def save_weather(dcl: Data) -> Data:
     Returns:
         Dataclass instance (pass for postprocessing)
     """
-    path = Args.path_out
     dcl = weather(dcl)
     min_temp = dcl.sum_arr[:, 1]
     max_temp = dcl.sum_arr[:, 2]
@@ -68,10 +67,10 @@ def save_weather(dcl: Data) -> Data:
     plt.title(f'{dcl.city}. Day temperature.')
     plt.axvline(x=dcl.curr_time)
     fig.autofmt_xdate()
-    new_path = path + dcl.country + '\\' + dcl.city + '\\'
+    new_path = Args.path_out + os.path.join(f"{dcl.country}", f"{dcl.city}")
     if not os.path.isdir(new_path):
         os.makedirs(new_path)
-    fig.savefig(new_path + f'weather_{dcl.city}.png')
+    fig.savefig(os.path.join(new_path, f'weather_{dcl.city}.png'))
     return dcl
 
 

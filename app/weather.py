@@ -24,7 +24,7 @@ from save import save_graphics, save_hotels_inf
 @contextmanager
 def unpack_files() -> None:
     """Unpack and delete these files after work."""
-    path = Config.path_inp
+    path = Args.path_inp
     source_dir = os.listdir(path)
     list_open_files = unpack_zip(source_dir)
     try:
@@ -32,7 +32,7 @@ def unpack_files() -> None:
     finally:
         for file in list_open_files:
             try:
-                os.remove(path + file)
+                os.remove(os.path.join(path, file))
             finally:
                 continue
 
@@ -46,10 +46,10 @@ def unpack_zip(source_list: List[str]) -> List[str]:
     Returns:
         List of files inside
     """
-    path = Config.path_inp
+    path = Args.path_inp
     for file in source_list:
         if file.endswith(".zip"):
-            with ZipFile(path + file) as myzip:
+            with ZipFile(os.path.join(path, file)) as myzip:
                 myzip.extractall(path)
                 return myzip.namelist()
 
@@ -60,7 +60,7 @@ def readline_gen() -> List[str]:
     Returns:
         Strings from unpacked .csv files
     """
-    path_input = Config.path_inp
+    path_input = Args.path_inp
     source_dir = os.listdir(path_input)
     for file in source_dir:
         if file.endswith(".csv"):
@@ -90,7 +90,7 @@ def coord_validator(coords: Tuple[str, str]) -> bool:
     return -90 <= latitude <= 90 and -180 <= longitude <= 180
 
 
-def args_parser() -> Tuple[str, int, str]:
+def args_parser() -> Tuple[str, str, int]:
     """Parse command line arguments.
 
     Returns:
@@ -149,7 +149,7 @@ def get_list_addresses(df2: DataFrame) -> List[str]:
     """
     lat = df2.Latitude.tolist()
     long = df2.Longitude.tolist()
-    with ThreadPoolExecutor(max_workers=Config.threads) as pool:
+    with ThreadPoolExecutor(max_workers=Args.threads) as pool:
         responses = pool.map(get_address, *(lat, long))
     return list(responses)
 
@@ -202,12 +202,24 @@ def add_geo_address(df: DataFrame) -> DataFrame:
     return df
 
 
+def set_global_arguments(path_inp: str = "", path_out: str = "",
+                         threads: int = 100) -> None:
+    """Set arguments into config.Args.
+
+    Args:
+        path_inp: Path to directory with input data
+        path_out: Path to the directory for the output
+        threads: Number of threads for parallel data processing
+    """
+    Args.path_inp = os.path.join(path_inp, '')
+    Args.path_out = os.path.join(path_out, '')
+    Args.threads = threads
+
+
 def main() -> None:
     """Synchronize the sequence of execution of program functions."""
     args = args_parser()
-    Config.path_inp = str(args[0])
-    Config.threads = int(args[2])
-    Config.path_out = str(args[1])
+    set_global_arguments(args[0], args[1], args[2])
     df = add_geo_address(select_main_cities(get_correct_df()))
     centres = get_cities_centre(df)
     lst_d_classes = save_graphics(centres)
