@@ -1,3 +1,5 @@
+"""Module saving data."""
+
 import os
 from concurrent.futures import ProcessPoolExecutor
 from typing import List
@@ -11,6 +13,16 @@ from treat import weather
 
 
 def save_hotels_inf(df2: DataFrame) -> None:
+    """Write the list of hotels to .csv .
+
+        Write (name, address, latitude, longitude) in CSV format in files containing no more than 100 entries each
+
+    Args:
+        df2: Dataframe in ["Name", "Geo_address", "Country", "City", "Latitude", "Longitude"] format
+
+    Returns:
+        Write to .csv in ["Name", "Geo_address", "Latitude", "Longitude"] format.
+    """
     for city, group in df2.groupby('City'):
         country = group.iloc[0].Country
         group = group[["Name", "Geo_address",
@@ -25,6 +37,19 @@ def save_hotels_inf(df2: DataFrame) -> None:
 
 
 def save_weather(dcl: Data) -> Data:
+    """Build graphs containing day dependencies and write to files.
+
+        - minimum temperature;
+        - maximum temperature
+        Place all the results obtained in the output directory with the following structure:
+        `{output_folder}\{country}\{city}\`
+
+    Args:
+        dcl: Dataclass instance.
+
+    Returns:
+        Dataclass instance (pass for postprocessing)
+    """
     path = Args.path_out
     dcl = weather(dcl)
     min_temp = dcl.sum_arr[:, 1]
@@ -51,6 +76,15 @@ def save_weather(dcl: Data) -> Data:
 
 
 def save_graphics(centres: List[Data]) -> List[Data]:
+    """Save all received charts in the catalog with the specified structure for each city.
+
+    Args:
+        centres: Dataclass instance with with information about the country, city, center coordinates
+
+    Returns:
+        List of instances of a dataclass with information about the city,
+        including arrays of weather data(historical, forecast, combine), for post-processing.
+    """
     with ProcessPoolExecutor(max_workers=Config.processes) as pool:
         d_classes = pool.map(save_weather, centres)
     return [dcl for dcl in d_classes]

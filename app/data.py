@@ -1,3 +1,5 @@
+"""Module defining the data structure."""
+
 import datetime
 from dataclasses import dataclass
 
@@ -6,6 +8,7 @@ import numpy as np
 
 @dataclass
 class Data:
+    """Store data, for the convenience of passing them as arguments to functions. """
     country: str
     city: str
     lat: float
