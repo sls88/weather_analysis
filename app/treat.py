@@ -64,7 +64,7 @@ def get_forecast_arr(data_f: Dict, dcl: Data) -> Data:
     """
     temps = [hour3['main']['temp'] for hour3 in data_f["list"]]
     arr = np.empty((0, 3))
-    for i in range(5):
+    for i in range(len(temps) // 8):
         c_date = dcl.mid_time + timedelta(days=i + 1)
         max_temp = max(temps[:8])
         min_temp = min(temps[:8])
@@ -77,31 +77,29 @@ def get_forecast_arr(data_f: Dict, dcl: Data) -> Data:
 
 class DayHistWeather:
     """Get historical weather data from the server, process, return 1 day array.
-
     Args:
         dcl: Dataclass instance
-        days: The number of days for which historical data is needed
+        days: The number of days for which historical data is needed. Amount must be > 0.
     """
     def __init__(self, dcl: Data, days: int) -> None:
         self.dcl = dcl
-        self.days = days
+        self.days = days + 1
         self.t_stamp = None
         self.day_temp = []
         self.count = 0
         self.j_data = None
         self.day_arr = None
+        self.day_counter = 0
 
     def historical_weather(self) -> None:
         """Get historical weather data.
-
         For the first day, data is returned from the current hour to 3:00 of the previous one,
         then 24 hours in each request. Also, each request contains the temperature at the current
         moment (we only need it from the first request)
-
         Returns:
             Write data to self.j_data
         """
-        api_key = Config.api_key_forecast
+        api_key = "653e3ab3208c8cb799cce402dd5d7580"
         url = "https://api.openweathermap.org/data/2.5/onecall/timemachine"
         res = requests.get(url, params={"lat": self.dcl.lat,
                                         "lon": self.dcl.lon,
@@ -112,16 +110,14 @@ class DayHistWeather:
 
     def get_hist_day(self) -> None:
         """Find the maximum and minimum temperature in 24 hours. Write to array.
-
         Returns:
             Write to self.day_arr
         """
-        if len(self.day_temp) >= 24:
-            min_temp = min(self.day_temp[:24])
-            max_temp = max(self.day_temp[:24])
-            mid_date = self.dcl.mid_time - timedelta(days=self.count - 1)
-            self.day_arr = np.array([mid_date, min_temp, max_temp])
-            del self.day_temp[:24]
+        min_temp = min(self.day_temp[:24])
+        max_temp = max(self.day_temp[:24])
+        mid_date = self.dcl.mid_time - timedelta(days=self.day_counter)
+        self.day_arr = np.array([mid_date, min_temp, max_temp])
+        del self.day_temp[:24]
 
     def treat_data(self) -> None:
         """Process the obtained temperature data. Add to the list."""
@@ -141,17 +137,19 @@ class DayHistWeather:
 
     def __next__(self) -> Union[np.ndarray, NoReturn]:
         """Return an array of historical weather data for 1 day.
-
         Returns:
             Array of historical weather data for 1 day
         """
+        if self.days == 1:
+            raise StopIteration
         if self.count < self.days:
             while len(self.day_temp) < 24:
-                self.count += 1
                 self.change_timestamp()
+                self.count += 1
                 self.historical_weather()
                 self.treat_data()
             self.get_hist_day()
+            self.day_counter += 1
             return self.day_arr
         else:
             raise StopIteration
