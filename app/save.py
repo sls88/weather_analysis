@@ -2,7 +2,6 @@
 
 import os
 from concurrent.futures import ProcessPoolExecutor
-from os import path
 from typing import List
 
 import matplotlib.pyplot as plt

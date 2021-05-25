@@ -87,4 +87,5 @@ def test_100lines_in_csv(test_dataframe, pathes):
         df3 = pd.read_csv(os.path.join(city2dir, "Kubik100.csv"))
         actual_result = [df1.count()[0], df2.count()[0], df3.count()[0]]
         expected_result = [100, 31, 74]
+
         assert actual_result == expected_result
