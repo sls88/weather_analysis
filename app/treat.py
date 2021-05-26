@@ -89,7 +89,7 @@ class DayHistWeather:
         self.count = 0
         self.j_data = None
         self.day_arr = None
-        self.day_counter = 0
+        self.day_output = 0
 
     def historical_weather(self) -> None:
         """Get historical weather data.
@@ -115,7 +115,7 @@ class DayHistWeather:
         """
         min_temp = min(self.day_temp[:24])
         max_temp = max(self.day_temp[:24])
-        mid_date = self.dcl.mid_time - timedelta(days=self.day_counter)
+        mid_date = self.dcl.mid_time - timedelta(days=self.day_output)
         self.day_arr = np.array([mid_date, min_temp, max_temp])
         del self.day_temp[:24]
 
@@ -140,16 +140,14 @@ class DayHistWeather:
         Returns:
             Array of historical weather data for 1 day
         """
-        if self.days == 1:
-            raise StopIteration
-        if self.count < self.days:
+        if self.day_output < self.days - 1:
             while len(self.day_temp) < 24:
                 self.change_timestamp()
                 self.count += 1
                 self.historical_weather()
                 self.treat_data()
             self.get_hist_day()
-            self.day_counter += 1
+            self.day_output += 1
             return self.day_arr
         else:
             raise StopIteration

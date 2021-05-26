@@ -7,36 +7,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Welcome to weather analisys’s documentation! &#8212; weather analisys 1 documentation</title>
+    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/scrolls.css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/theme_extras.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-  
+    <div id="content">
+      <div class="header">
+        <h1 class="heading"><a href="#"
+          title="back to the documentation overview"><span>Welcome to weather analisys’s documentation!</span></a></h1>
+      </div>
+      <div class="relnav" role="navigation" aria-label="related navigation">
+        <a href="#">Welcome to weather analisys’s documentation!</a>
+      </div>
+      <div id="contentwrapper">
+        <div id="toc" role="navigation" aria-label="table of contents navigation">
+          <h3>Table of Contents</h3>
+          <ul>
+<li><a class="reference internal" href="#">Welcome to weather analisys’s documentation!</a></li>
+<li><a class="reference internal" href="#weather-analizator">Weather analizator</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
+        </div>
+        <div role="main">
+        
   <section id="welcome-to-weather-analisys-s-documentation">
 <h1>Welcome to weather analisys’s documentation!<a class="headerlink" href="#welcome-to-weather-analisys-s-documentation" title="Permalink to this headline">¶</a></h1>
 </section>
 <section id="weather-analizator">
 <h1>Weather analizator<a class="headerlink" href="#weather-analizator" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-config"></span><p>Module, data configuration.</p>
+<p><h4><b>Description</b></h4></p>
+<p>
+  The application is presented in the form of a console utility for multithreaded 
+  data processing, accumulation of results via API from the Internet and their further presentation on graphs. 
+</p>
+<p>
+The readable resource must be an archive <b>.ZIP</b> with <b>.CSV</b> files inside. Each file should contain 
+information about hotels, indicating the country, city, hotel name and location coordinates. Format "Id, Name, 
+Country, City, Latitude, Longitude". Delimiter ","
+</p>
+<p>
+<em>
+Before starting the application, check the integrity of all data in the resource file. If the coordinates 
+contain errors or any data in the line is missing, the whole line will be deleted. 
+</em>
+</p>
+<p>
+  After processing the data, in the specified outgoing directory, directories corresponding to 
+  the names of the countries will be created from the transferred resource files.  
+</p>
+<p>
+  Each folder will contain a folder with the name of the city containing the largest number of hotels. 
+  It will contain a graph with analysis of maximum and minimum daily temperatures based on historical 
+  data and weather forecast for 10 days. The directory will contain information about hotels in this 
+  city in SWR files of the "Name, Geo_address, Latitude, Longitude" format, Separator ","
+</p>
+<p>
+  In the root folder of the specified outgoing path, 3 folders will be created with data on the analysis
+   of 3 data arrays: historical weather data for 5 days, weather forecast for 5 days, total array 
+   for 10 days (historical data + forecast).<br>
+  Data analysis is:<br>
+  - city and day of observation with the maximum temperature for the period under consideration;<br>
+  - city with the maximum change in maximum temperature;<br>
+  - city and day of observation with the minimum temperature for the period under consideration;<br>
+  - city and day with the maximum difference between the maximum and minimum temperatures.<br>
+  And it will be saved in 2 data formats: .CSV and .JSON
+</p>
+<p><h4><b>Application launch</b></h4></p>
+<p>
+Go to the root folder of the weather_analysis application <br>
+Type the command in the console: python PATH_TO_CATALOG\app\weather.py arg1 arg2 arg3<br>
+</p>
+<p>
+arg1 - the path to the resource file (the trailing slash is not needed) <br>
+arg2 - path to the directory where to put the information after processing <br>
+arg3 - number of threads to process data <br>
+</p>
+<p>
+<em>
+  Please note that the specified directory, with the archive of resources, should not
+  contain .CSV files, because automatic unpacking occurs, followed by deletion of all unpacked files 
+</em>
+</p>
+</p>
+<span class="target" id="module-config"></span><p><h3>Module, data configuration.</h3></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="config.Args">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">Args</span></span><a class="headerlink" href="#config.Args" title="Permalink to this definition">¶</a></dt>
@@ -46,17 +109,23 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="config.Config">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><a class="headerlink" href="#config.Config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Custom configurations.</p>
+<dd><p>The class contains variables about the keys to the API of the weather sites,<br> 
+  if the keys run out, you will need to go through the registration procedure at <br>
+  https://openweathermap.org to get api_key_forecast and at <br>
+  https://developer.here.com for api_key_geoloc. <br>
+  processes = 8 - The number of processes involved in receiving weather data, <br>
+  processing and saving. By default, the number is set to 8, but if your computer <br>
+  supports more, you can change this number. </p>
 </dd></dl>
 
-<span class="target" id="module-data"></span><p>Module defining the data structure.</p>
+<span class="target" id="module-data"></span><p><h3>Module defining the data structure.</h3></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="data.Data">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data.</span></span><span class="sig-name descname"><span class="pre">Data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">country:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></em>, <em class="sig-param"><span class="pre">city:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></em>, <em class="sig-param"><span class="pre">lat:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></em>, <em class="sig-param"><span class="pre">lon:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></em>, <em class="sig-param"><span class="pre">curr_time:</span> <span class="pre">&lt;module</span> <span class="pre">'datetime'</span> <span class="pre">from</span> <span class="pre">'C:\\Users\\Dmitry\\AppData\\Local\\Programs\\Python\\Python39\\lib\\datetime.py'&gt;</span> <span class="pre">=</span> <span class="pre">datetime.timedelta(0)</span></em>, <em class="sig-param"><span class="pre">mid_time:</span> <span class="pre">&lt;module</span> <span class="pre">'datetime'</span> <span class="pre">from</span> <span class="pre">'C:\\Users\\Dmitry\\AppData\\Local\\Programs\\Python\\Python39\\lib\\datetime.py'&gt;</span> <span class="pre">=</span> <span class="pre">datetime.timedelta(0)</span></em>, <em class="sig-param"><span class="pre">temp:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></em>, <em class="sig-param"><span class="pre">hist_arr:</span> <span class="pre">numpy.ndarray</span> <span class="pre">=</span> <span class="pre">array([]</span></em>, <em class="sig-param"><span class="pre">shape=(0</span></em>, <em class="sig-param"><span class="pre">3)</span></em>, <em class="sig-param"><span class="pre">dtype=float64)</span></em>, <em class="sig-param"><span class="pre">fore_arr:</span> <span class="pre">numpy.ndarray</span> <span class="pre">=</span> <span class="pre">array([]</span></em>, <em class="sig-param"><span class="pre">shape=(0</span></em>, <em class="sig-param"><span class="pre">3)</span></em>, <em class="sig-param"><span class="pre">dtype=float64)</span></em>, <em class="sig-param"><span class="pre">sum_arr:</span> <span class="pre">numpy.ndarray</span> <span class="pre">=</span> <span class="pre">array([]</span></em>, <em class="sig-param"><span class="pre">shape=(0</span></em>, <em class="sig-param"><span class="pre">3)</span></em>, <em class="sig-param"><span class="pre">dtype=float64)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.Data" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data.</span></span><span class="sig-name descname"><span class="pre">Data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">country:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></em>, <em class="sig-param"><span class="pre">city:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></em>, <em class="sig-param"><span class="pre">lat:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></em>, <em class="sig-param"><span class="pre">lon:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></em>, <em class="sig-param"><span class="pre">curr_time:</span> <span class="pre">&lt;module</span> <span class="pre">'datetime'</span> <span class="pre">from</span> <span class="pre">&gt;</span> <span class="pre">=</span> <span class="pre">datetime.timedelta(0)</span></em>, <em class="sig-param"><span class="pre">mid_time:</span> <span class="pre">&lt;module</span> <span class="pre">'datetime'</span> <span class="pre">from</span> <span class="pre">&gt;</span> <span class="pre">=</span> <span class="pre">datetime.timedelta(0)</span></em>, <em class="sig-param"><span class="pre">temp:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></em>, <em class="sig-param"><span class="pre">hist_arr:</span> <span class="pre">numpy.ndarray</span> <span class="pre">=</span> <span class="pre">array([]</span></em>, <em class="sig-param"><span class="pre">shape=(0</span></em>, <em class="sig-param"><span class="pre">3)</span></em>, <em class="sig-param"><span class="pre">dtype=float64)</span></em>, <em class="sig-param"><span class="pre">fore_arr:</span> <span class="pre">numpy.ndarray</span> <span class="pre">=</span> <span class="pre">array([]</span></em>, <em class="sig-param"><span class="pre">shape=(0</span></em>, <em class="sig-param"><span class="pre">3)</span></em>, <em class="sig-param"><span class="pre">dtype=float64)</span></em>, <em class="sig-param"><span class="pre">sum_arr:</span> <span class="pre">numpy.ndarray</span> <span class="pre">=</span> <span class="pre">array([]</span></em>, <em class="sig-param"><span class="pre">shape=(0</span></em>, <em class="sig-param"><span class="pre">3)</span></em>, <em class="sig-param"><span class="pre">dtype=float64)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.Data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store data, for the convenience of passing them as arguments to functions.</p>
 </dd></dl>
 
-<span class="target" id="module-postprocess"></span><p>Post-processing module.</p>
+<span class="target" id="module-postprocess"></span><p><h3>Post-processing module.</h3></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="postprocess.concatenate_arrays">
 <span class="sig-prename descclassname"><span class="pre">postprocess.</span></span><span class="sig-name descname"><span class="pre">concatenate_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#postprocess.concatenate_arrays" title="Permalink to this definition">¶</a></dt>
@@ -167,7 +236,7 @@
 </dl>
 </dd></dl>
 
-<span class="target" id="module-save"></span><p>Module saving data.</p>
+<span class="target" id="module-save"></span><p><h3>Module saving data.</h3></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="save.save_graphics">
 <span class="sig-prename descclassname"><span class="pre">save.</span></span><span class="sig-name descname"><span class="pre">save_graphics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centres</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#save.save_graphics" title="Permalink to this definition">¶</a></dt>
@@ -200,41 +269,13 @@ including arrays of weather data(historical, forecast, combine), for post-proces
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="save.save_weather">
-<span class="sig-prename descclassname"><span class="pre">save.</span></span><span class="sig-name descname"><span class="pre">save_weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcl</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><a class="headerlink" href="#save.save_weather" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build graphs containing day dependencies and write to files.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>minimum temperature;</p></li>
-<li><p>maximum temperature</p></li>
-</ul>
-<p>Place all the results obtained in the output directory with the following structure:
-<a href="#id1"><span class="problematic" id="id2">`</span></a>{output_folder}{country}{city}`</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dcl</strong> – Dataclass instance.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dataclass instance (pass for postprocessing)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<span class="target" id="module-treat"></span><p>Module for receiving and processing data.</p>
+<span class="target" id="module-treat"></span><p><h3>Module for receiving and processing data.</h3></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="treat.DayHistWeather">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">treat.</span></span><span class="sig-name descname"><span class="pre">DayHistWeather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcl</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#treat.DayHistWeather" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get historical weather data from the server, process, return 1 day array.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dcl</strong> – Dataclass instance</p></li>
-<li><p><strong>days</strong> – The number of days for which historical data is needed</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Get historical weather data from the server, process, return 1 day array.
+:param dcl: Dataclass instance
+:param days: The number of days for which historical data is needed. Amount must be &gt; 0.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="treat.DayHistWeather.__iter__">
 <span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#treat.DayHistWeather" title="treat.DayHistWeather"><span class="pre">treat.DayHistWeather</span></a><a class="headerlink" href="#treat.DayHistWeather.__iter__" title="Permalink to this definition">¶</a></dt>
@@ -244,12 +285,8 @@ including arrays of weather data(historical, forecast, combine), for post-proces
 <dl class="py method">
 <dt class="sig sig-object py" id="treat.DayHistWeather.__next__">
 <span class="sig-name descname"><span class="pre">__next__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">NoReturn</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#treat.DayHistWeather.__next__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an array of historical weather data for 1 day.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Array of historical weather data for 1 day</p>
-</dd>
-</dl>
+<dd><p>Return an array of historical weather data for 1 day.
+:returns: Array of historical weather data for 1 day</p>
 </dd></dl>
 
 <dl class="py method">
@@ -261,26 +298,18 @@ including arrays of weather data(historical, forecast, combine), for post-proces
 <dl class="py method">
 <dt class="sig sig-object py" id="treat.DayHistWeather.get_hist_day">
 <span class="sig-name descname"><span class="pre">get_hist_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#treat.DayHistWeather.get_hist_day" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the maximum and minimum temperature in 24 hours. Write to array.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Write to self.day_arr</p>
-</dd>
-</dl>
+<dd><p>Find the maximum and minimum temperature in 24 hours. Write to array.
+:returns: Write to self.day_arr</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="treat.DayHistWeather.historical_weather">
 <span class="sig-name descname"><span class="pre">historical_weather</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#treat.DayHistWeather.historical_weather" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get historical weather data.</p>
-<p>For the first day, data is returned from the current hour to 3:00 of the previous one,
+<dd><p>Get historical weather data.
+For the first day, data is returned from the current hour to 3:00 of the previous one,
 then 24 hours in each request. Also, each request contains the temperature at the current
-moment (we only need it from the first request)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Write data to self.j_data</p>
-</dd>
-</dl>
+moment (we only need it from the first request)
+:returns: Write data to self.j_data</p>
 </dd></dl>
 
 <dl class="py method">
@@ -380,7 +409,7 @@ mid_time - curr_time-12 hours.</p>
 </dl>
 </dd></dl>
 
-<span class="target" id="module-weather"></span><p>Main module.</p>
+<span class="target" id="module-weather"></span><p><h3>Main module.</h3></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="weather.add_geo_address">
 <span class="sig-prename descclassname"><span class="pre">weather.</span></span><span class="sig-name descname"><span class="pre">add_geo_address</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.frame.DataFrame</span><a class="headerlink" href="#weather.add_geo_address" title="Permalink to this definition">¶</a></dt>
@@ -558,66 +587,13 @@ mid_time - curr_time-12 hours.</p>
 </section>
 
 
-          </div>
-          
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">weather analisys</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="#">Documentation overview</a><ul>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2021, Dmitry Zhitin.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Dmitry Zhitin.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
   </body>
 </html>

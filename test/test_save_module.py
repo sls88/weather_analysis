@@ -4,32 +4,23 @@ import shutil
 import sys
 sys.path.append(os.path.abspath('../app'))
 from contextlib import contextmanager
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
 import pytest
 
-import app.treat
+# import app.treat
 from app.data import Data
-from app.save import save_weather, save_hotels_inf
+from app.save import SaveWeather, save_hotels_inf
 from app.weather import set_global_arguments
 
 
 @pytest.fixture()
-def data_for_save():
+def output_folder():
     path_output = os.path.abspath(os.path.dirname(__file__))
     set_global_arguments("", path_output)
-    dcl = Data()
-    dcl.sum_arr = np.array([[datetime.datetime(2021, 5, 25, 0, 21, 8), 5, 1],
-                            [datetime.datetime(2021, 5, 24, 0, 21, 8), 5, 1],
-                            [datetime.datetime(2021, 5, 23, 0, 21, 8), 5, 1],
-                            [datetime.datetime(2021, 5, 22, 0, 21, 8), 5, 1],
-                            [datetime.datetime(2021, 5, 21, 0, 21, 8), 5, 1]])
-    dcl.curr_time = datetime.datetime(2021, 5, 23, 0, 21, 8)
-    dcl.temp = 20
-    dcl.country = "RU"
-    dcl.city = "Msk"
-    return dcl, path_output
+    return path_output
 
 
 @contextmanager
@@ -40,12 +31,25 @@ def clean_folder(path, name_dir):
         shutil.rmtree(os.path.join(path, name_dir))
 
 
-def test_save_graphics(data_for_save, monkeypatch):
-    dcl = data_for_save[0]
-    output_folder = data_for_save[1]
-    monkeypatch.setattr(app.treat, "weather", dcl)
-    with clean_folder(data_for_save[1], "RU"):
-        save_weather(dcl)
+class DataTest:
+    def data(self):
+        dcl = Data()
+        dcl.sum_arr = np.array([[datetime.datetime(2021, 5, 25, 0, 21, 8), 5, 1],
+                                [datetime.datetime(2021, 5, 24, 0, 21, 8), 5, 1],
+                                [datetime.datetime(2021, 5, 23, 0, 21, 8), 5, 1],
+                                [datetime.datetime(2021, 5, 22, 0, 21, 8), 5, 1],
+                                [datetime.datetime(2021, 5, 21, 0, 21, 8), 5, 1]])
+        dcl.curr_time = datetime.datetime(2021, 5, 23, 0, 21, 8)
+        dcl.temp = 20
+        dcl.country = "RU"
+        dcl.city = "Msk"
+        return dcl
+
+
+def test_save_graphics(output_folder, monkeypatch):
+    with clean_folder(output_folder, "RU"):
+        monkeypatch.setattr(SaveWeather, "get_concat_array", DataTest.data)
+        SaveWeather.save_weather(DataTest.data)
         expected_result = os.listdir(os.path.join(output_folder, "RU", "Msk"))[0]
         actual_result = "weather_Msk.png"
 

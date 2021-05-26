@@ -35,42 +35,48 @@ def save_hotels_inf(df2: DataFrame) -> None:
                                        f'{city}', f'{city}{i}.csv'), index=False)
 
 
-def save_weather(dcl: Data) -> Data:
-    """Build graphs containing day dependencies and write to files.
+class SaveWeather:
+    @staticmethod
+    def get_concat_array(dcl):
+        return weather(dcl)
 
-        - minimum temperature;
-        - maximum temperature
-        Place all the results obtained in the output directory with the following structure:
-        `{output_folder}\{country}\{city}\`
+    @staticmethod
+    def save_weather(dcl: Data) -> Data:
+        """Build graphs containing day dependencies and write to files.
 
-    Args:
-        dcl: Dataclass instance.
+            - minimum temperature;
+            - maximum temperature
+            Place all the results obtained in the output directory with the following structure:
+            `{output_folder}\{country}\{city}\`
 
-    Returns:
-        Dataclass instance (pass for postprocessing)
-    """
-    dcl = weather(dcl)
-    min_temp = dcl.sum_arr[:, 1]
-    max_temp = dcl.sum_arr[:, 2]
-    date_day = dcl.sum_arr[:, 0]
-    fig, ax = plt.subplots()
-    ax.plot(date_day, min_temp, "b", label="min day temperature, C")
-    ax.plot(date_day, max_temp, "r", label="max day temperature, C")
-    plt.scatter(dcl.curr_time, dcl.temp, color='g', s=40,
-                marker='o', label=f"current temp. {dcl.temp}, C")
-    ax.grid()
-    ax.legend()
-    plt.xticks(date_day)
-    plt.xlabel('Date, 1 day')
-    plt.ylabel('Temperature, C')
-    plt.title(f'{dcl.city}. Day temperature.')
-    plt.axvline(x=dcl.curr_time)
-    fig.autofmt_xdate()
-    new_path = Args.path_out + os.path.join(f"{dcl.country}", f"{dcl.city}")
-    if not os.path.isdir(new_path):
-        os.makedirs(new_path)
-    fig.savefig(os.path.join(new_path, f'weather_{dcl.city}.png'))
-    return dcl
+        Args:
+            dcl: Dataclass instance.
+
+        Returns:
+            Dataclass instance (pass for postprocessing)
+        """
+        dcl = SaveWeather.get_concat_array(dcl)
+        min_temp = dcl.sum_arr[:, 1]
+        max_temp = dcl.sum_arr[:, 2]
+        date_day = dcl.sum_arr[:, 0]
+        fig, ax = plt.subplots()
+        ax.plot(date_day, min_temp, "b", label="min day temperature, C")
+        ax.plot(date_day, max_temp, "r", label="max day temperature, C")
+        plt.scatter(dcl.curr_time, dcl.temp, color='g', s=40,
+                    marker='o', label=f"current temp. {dcl.temp}, C")
+        ax.grid()
+        ax.legend()
+        plt.xticks(date_day)
+        plt.xlabel('Date, 1 day')
+        plt.ylabel('Temperature, C')
+        plt.title(f'{dcl.city}. Day temperature.')
+        plt.axvline(x=dcl.curr_time)
+        fig.autofmt_xdate()
+        new_path = Args.path_out + os.path.join(f"{dcl.country}", f"{dcl.city}")
+        if not os.path.isdir(new_path):
+            os.makedirs(new_path)
+        fig.savefig(os.path.join(new_path, f'weather_{dcl.city}.png'))
+        return dcl
 
 
 def save_graphics(centres: List[Data]) -> List[Data]:
@@ -84,5 +90,5 @@ def save_graphics(centres: List[Data]) -> List[Data]:
         including arrays of weather data(historical, forecast, combine), for post-processing.
     """
     with ProcessPoolExecutor(max_workers=Config.processes) as pool:
-        d_classes = pool.map(save_weather, centres)
+        d_classes = pool.map(SaveWeather.save_weather, centres)
     return [dcl for dcl in d_classes]
