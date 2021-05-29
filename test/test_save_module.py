@@ -4,15 +4,13 @@ import shutil
 import sys
 sys.path.append(os.path.abspath('../app'))
 from contextlib import contextmanager
-from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
 import pytest
 
-# import app.treat
 from app.data import Data
-from app.save import SaveWeather, save_hotels_inf
+from app.save import SaveData
 from app.weather import set_global_arguments
 
 
@@ -48,8 +46,8 @@ class DataTest:
 
 def test_save_graphics(output_folder, monkeypatch):
     with clean_folder(output_folder, "RU"):
-        monkeypatch.setattr(SaveWeather, "get_concat_array", DataTest.data)
-        SaveWeather.save_weather(DataTest.data)
+        monkeypatch.setattr(SaveData, "get_concat_array", DataTest.data)
+        SaveData.save_weather(DataTest.data)
         expected_result = os.listdir(os.path.join(output_folder, "RU", "Msk"))[0]
         actual_result = "weather_Msk.png"
 
@@ -85,7 +83,7 @@ def test_100lines_in_csv(test_dataframe, pathes):
     p = pathes
     path_out, city1dir, city2dir = p[0], p[1], p[2]
     with clean_folder(path_out, ''):
-        save_hotels_inf(test_dataframe)
+        SaveData.save_hotels_inf(test_dataframe)
         df1 = pd.read_csv(os.path.join(city1dir, "London100.csv"))
         df2 = pd.read_csv(os.path.join(city1dir, "London200.csv"))
         df3 = pd.read_csv(os.path.join(city2dir, "Kubik100.csv"))

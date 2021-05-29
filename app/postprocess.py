@@ -8,12 +8,13 @@ import pandas as pd
 import numpy as np
 from pandas import DataFrame
 
-from data import Data
 from config import Args
+from data import Data
+from save import SavePostProc
 
 
 def max_temp(df: DataFrame, dir_name: str) -> None:
-    """Find the city and day of observation with the maximum temperature. Write data to .csv .json files.
+    """Find the city and day of observation with the maximum temperature. Pass for write.
 
     Args:
         df: Data format ('Country', 'City', 'Date', 'Min_t', 'Max_t')
@@ -22,15 +23,11 @@ def max_temp(df: DataFrame, dir_name: str) -> None:
     """
     df = df.sort_values(["Max_t"], ascending=False).groupby("City").head(1).head(1)
     df = df[["Country", "City", "Date", "Max_t"]]
-    df.to_csv(os.path.join(f'{Args.path_out}{dir_name}',
-                           'max_temperature.csv'), index=False)
-    df = df.reset_index(drop=True).loc[0]
-    df.to_json(os.path.join(f'{Args.path_out}{dir_name}',
-                            'max_temperature.json'), index=True)
+    SavePostProc.save_max_temp(df, dir_name)
 
 
 def min_temp(df: DataFrame, dir_name: str) -> None:
-    """Find the city and day of observation with the minimum temperature. Write data to .csv .json files.
+    """Find the city and day of observation with the minimum temperature. Pass for write.
 
     Args:
         df: Data format ('Country', 'City', 'Date', 'Min_t', 'Max_t')
@@ -39,14 +36,13 @@ def min_temp(df: DataFrame, dir_name: str) -> None:
     """
     df = df.sort_values(["Min_t"], ascending=True).groupby("City").head(1).head(1)
     df = df[["Country", "City", "Date", "Min_t"]]
-    df.to_csv(os.path.join(f'{Args.path_out}{dir_name}', 'min_temperature.csv'), index=False)
-    df = df.reset_index(drop=True).loc[0]
-    df.to_json(os.path.join(f'{Args.path_out}{dir_name}', 'min_temperature.json'), index=True)
+    SavePostProc.save_min_temp(df, dir_name)
 
 
 def min_max_diff(df: DataFrame, dir_name: str) -> None:
-    """Find city with maximum change in maximum temperature . Write data to .csv .json files.
+    """Find city and day with the maximum difference between the maximum and minimum temperatures.
 
+        Pass for write.
     Args:
         df: Data format ('Country', 'City', 'Date', 'Min_t', 'Max_t')
         dir_name: the name of the directory corresponding to the type of analyzed data
@@ -56,17 +52,11 @@ def min_max_diff(df: DataFrame, dir_name: str) -> None:
     df = df.sort_values(["Max_diff_b_max_min_temp"],
                         ascending=False).groupby("City").head(1).head(1)
     df = df[["Country", "City", "Date", "Max_diff_b_max_min_temp"]]
-    df.to_csv(os.path.join(f'{Args.path_out}{dir_name}',
-                           'max_difference_between_max_and_min_temp.csv'), index=False)
-    df = df.reset_index(drop=True).loc[0]
-    df.to_json(os.path.join(f'{Args.path_out}{dir_name}',
-                            'max_difference_between_max_and_min_temp.json'), index=True)
+    SavePostProc.save_min_max_diff(df, dir_name)
 
 
 def max_diff_max_temp(df: DataFrame, dir_name: str) -> None:
-    """Find the city and day with the maximum difference between the maximum and minimum temperatures.
-
-        Write data to .csv .json files.
+    """Find the city with maximum change in maximum temperature. Pass for write.
 
     Args:
         df: Data format ('Country', 'City', 'Date', 'Min_t', 'Max_t')
@@ -80,11 +70,7 @@ def max_diff_max_temp(df: DataFrame, dir_name: str) -> None:
     df = df.sort_values(["Max_t"], ascending=False).head(1)
     df = df.rename(columns={"Max_t": "Max_diff_max_temp"})
     df = df[["Country", "City", "Max_diff_max_temp"]]
-    df.to_csv(os.path.join(f'{Args.path_out}{dir_name}',
-                           'max_change_in_max_temp.csv'), index=False)
-    df = df.reset_index(drop=True).loc[0]
-    df.to_json(os.path.join(f'{Args.path_out}{dir_name}',
-                            'max_change_in_max_temp.json'), index=True)
+    SavePostProc.save_max_diff_max_temp(df, dir_name)
 
 
 def create_df(dcl: Data, dcl_arr: np.ndarray) -> DataFrame:

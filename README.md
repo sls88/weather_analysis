@@ -3,6 +3,7 @@
 # Development
 
 ## Install dev requirements
+`install Python 3.9`
 `pip install -r requirements.txt`
 
 ## Run test

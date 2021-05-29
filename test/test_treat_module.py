@@ -31,8 +31,8 @@ def test_forecast_array():
 @pytest.fixture()
 def call2():
     path1 = os.path.abspath(os.path.dirname(__file__))
-    path2 = os.path.join(path1, 'test_files', 'fake_res_hist_data_10days.txt')
-    path3 = os.path.join(path1, 'test_files', 'fake_res_hist_data_24days.txt')
+    path2 = os.path.join(path1, 'test_files', 'fake_res_hist_data_10hours.txt')
+    path3 = os.path.join(path1, 'test_files', 'fake_res_hist_data_24hours.txt')
     with open(path2, "r") as f1, open(path3, "r") as f2:
         fake_res1 = f1.read()
         fake_res2 = f2.read()

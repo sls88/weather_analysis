@@ -1,24 +1,25 @@
 """Main module."""
 
 import csv
+import logging
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from typing import List, Tuple
 from zipfile import ZipFile
 
-import argparse
+import click
 import numpy as np
 import pandas as pd
-# from geopy.adapters import AioHTTPAdapter
-# from geopy.geocoders import Nominatim
 from geopy import Here
 from pandas import DataFrame
 
-from config import Args, Config
+from config import Args
 from data import Data
 from postprocess import general_postprocess_func_save
-from save import save_graphics, save_hotels_inf
+from save import SaveData
+from secret import KEY
 
 
 @contextmanager
@@ -90,37 +91,53 @@ def coord_validator(coords: Tuple[str, str]) -> bool:
     return -90 <= latitude <= 90 and -180 <= longitude <= 180
 
 
-def args_parser() -> Tuple[str, str, int]:
-    """Parse command line arguments.
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-    Returns:
-        Arguments.
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.argument('path_input')
+@click.argument('path_output')
+@click.argument('threads', type=click.INT)
+def args_parser(path_input: str, path_output: str, threads: int) -> None:
+    """Weather analysis.
+
+    \b
+    Go to the root folder of the weather_analysis application
+    Type the command in the console:
+    python PATH_TO_CATALOG\\app\weather.py PATH_INPUT PATH_OUTPUT THREADS
+
+    \b
+    PATH_INPUT - the path to the resource file (the trailing slash is not needed)
+    PATH_OUTPUT - path to the directory where to put the information after processing
+    THREADS - number of threads to process data
+
+    \b
+    Please note that the specified directory, with the archive of resources,
+    should not contain .CSV files, because automatic unpacking occurs,
+    followed by deletion of all .CSV files from this directory
     """
-    parser = argparse.ArgumentParser(description='Weather analysis.')
-    parser.add_argument('path_input', type=str,
-                        help='path to directory with input data')
-    parser.add_argument('path_output', type=str,
-                        help='path to the directory for the output')
-    parser.add_argument('threads', type=int,
-                        help='number of threads for parallel data processing')
-    args = parser.parse_args()
-    os.chdir(args.path_input)
-    return args.path_input, args.path_output, args.threads
+    os.chdir(path_input)
+    set_global_arguments(path_input, path_output, threads)
+    logging.info("Program started")
+    main()
 
 
-def get_correct_df() -> DataFrame:
+def get_correct_df() -> Tuple[DataFrame, int]:
     """Check if the necessary values and coordinates exist and write a string to the dataframe.
 
     Returns:
-        Dataframe object
+        df: Dataframe object
+        no_valid_counter: counter no valid lines
     """
     with unpack_files():
         df = pd.DataFrame(columns=('Name', 'Country', 'City', 'Latitude', 'Longitude'))
+        no_valid_counter = 0
         for num, line in enumerate(readline_gen()):
             val = coord_validator((line[4], line[5]))
             if line[1] and line[2] and line[3] and val:
                 df.loc[num] = line[1:]
-        return df
+            else:
+                no_valid_counter += 1
+        return df, no_valid_counter
 
 
 def get_address(latitude: float, longitude: float) -> str:
@@ -133,7 +150,7 @@ def get_address(latitude: float, longitude: float) -> str:
     Returns:
         A string with the geographic address of the hotel
     """
-    geolocator = Here(apikey=Config.api_key_geoloc) #, adapter_factory=AioHTTPAdapter
+    geolocator = Here(apikey=KEY.api_key_geoloc)
     coord_str = str(latitude)+", "+str(longitude)
     return str(geolocator.reverse(coord_str))
 
@@ -218,14 +235,26 @@ def set_global_arguments(path_inp: str = "", path_out: str = "",
 
 def main() -> None:
     """Synchronize the sequence of execution of program functions."""
-    args = args_parser()
-    set_global_arguments(args[0], args[1], args[2])
-    df = add_geo_address(select_main_cities(get_correct_df()))
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    logging.info(" Program started")
+    df_t = get_correct_df()
+    logging.info(" Completed getting the correct dataframe. Deleted incorrect positions: %s" % df_t[1])
+    df = select_main_cities(df_t[0])
+    logging.info(" The process of enriching data about hotels with their geographic address has begun ... ")
+    df = add_geo_address(df)
+    logging.info(" The dataframe with the geographic address of the hotels has been successfully created.")
     centres = get_cities_centre(df)
-    lst_d_classes = save_graphics(centres)
-    save_hotels_inf(df)
+    logging.info(" Coordinates of city centers are calculated.")
+    logging.info(" The process of saving charts has begun...")
+    lst_d_classes = SaveData.save_graphics(centres)
+    logging.info(" Saving charts completed.")
+    SaveData.save_hotels_inf(df)
+    logging.info(" Hotel information saved successfully.")
+    logging.info(" Post processing started...")
     general_postprocess_func_save(lst_d_classes)
-
+    logging.info(" Completed saving information.")
+    logging.info(" Data available in the catalog %s" % Args.path_out)
 
 if __name__ == "__main__":
-    main()
+    args_parser()

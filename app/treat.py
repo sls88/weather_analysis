@@ -7,8 +7,8 @@ from typing import Dict, NoReturn, Union
 
 import requests
 
-from config import Config
 from data import Data
+from secret import KEY
 
 
 def set_curr_time(data_hist: Dict, dcl: Data) -> None:
@@ -39,7 +39,7 @@ def forecast(dcl: Data) -> Data:
     Returns:
         Dataclass instance
     """
-    api_key = Config.api_key_forecast
+    api_key = KEY.api_key_forecast
     url = "http://api.openweathermap.org/data/2.5/forecast"
     res = requests.get(url, params={"lat": dcl.lat,
                                     "lon": dcl.lon,
@@ -99,7 +99,7 @@ class DayHistWeather:
         Returns:
             Write data to self.j_data
         """
-        api_key = "653e3ab3208c8cb799cce402dd5d7580"
+        api_key = KEY.api_key_forecast
         url = "https://api.openweathermap.org/data/2.5/onecall/timemachine"
         res = requests.get(url, params={"lat": self.dcl.lat,
                                         "lon": self.dcl.lon,

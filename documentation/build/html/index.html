@@ -73,14 +73,23 @@ contain errors or any data in the line is missing, the whole line will be delete
 </p>
 <p>
   In the root folder of the specified outgoing path, 3 folders will be created with data on the analysis
-   of 3 data arrays: historical weather data for 5 days, weather forecast for 5 days, total array 
-   for 10 days (historical data + forecast).<br>
+    of 3 data arrays: historical weather data for 5 days, weather forecast for 5 days, total array 
+    for 10 days (historical data + forecast).<br>
   Data analysis is:<br>
   - city and day of observation with the maximum temperature for the period under consideration;<br>
   - city with the maximum change in maximum temperature;<br>
   - city and day of observation with the minimum temperature for the period under consideration;<br>
   - city and day with the maximum difference between the maximum and minimum temperatures.<br>
   And it will be saved in 2 data formats: .CSV and .JSON
+</p>
+<p><h4><b>License</b></h4></p>
+<p>
+The file secret.py contains keys for accessing weather forecast websites,<br>
+learning historical weather data and obtaining geo-addresses of hotels <br>
+if the keys run out, you will need to go through the registration procedure at<br>
+https://openweathermap.org to get api_key_forecast and at<br>
+https://developer.here.com for api_key_geoloc.<br>
+After that you should change it in KEY class.<br>
 </p>
 <p><h4><b>Application launch</b></h4></p>
 <p>
@@ -109,13 +118,10 @@ arg3 - number of threads to process data <br>
 <dl class="py class">
 <dt class="sig sig-object py" id="config.Config">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><a class="headerlink" href="#config.Config" title="Permalink to this definition">¶</a></dt>
-<dd><p>The class contains variables about the keys to the API of the weather sites,<br> 
-  if the keys run out, you will need to go through the registration procedure at <br>
-  https://openweathermap.org to get api_key_forecast and at <br>
-  https://developer.here.com for api_key_geoloc. <br>
-  processes = 8 - The number of processes involved in receiving weather data, <br>
-  processing and saving. By default, the number is set to 8, but if your computer <br>
-  supports more, you can change this number. </p>
+<dd><p>Custom configurations.</p>
+<p>processes = 8 - The number of processes involved in receiving weather data,
+processing and saving. By default, the number is set to 8, but if your computer
+supports more, you can change this number.</p>
 </dd></dl>
 
 <span class="target" id="module-data"></span><p><h3>Module defining the data structure.</h3></p>
@@ -176,10 +182,7 @@ arg3 - number of threads to process data <br>
 <dl class="py function">
 <dt class="sig sig-object py" id="postprocess.max_diff_max_temp">
 <span class="sig-prename descclassname"><span class="pre">postprocess.</span></span><span class="sig-name descname"><span class="pre">max_diff_max_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#postprocess.max_diff_max_temp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the city and day with the maximum difference between the maximum and minimum temperatures.</p>
-<blockquote>
-<div><p>Write data to .csv .json files.</p>
-</div></blockquote>
+<dd><p>Find the city with maximum change in maximum temperature. Pass for write.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -194,7 +197,7 @@ arg3 - number of threads to process data <br>
 <dl class="py function">
 <dt class="sig sig-object py" id="postprocess.max_temp">
 <span class="sig-prename descclassname"><span class="pre">postprocess.</span></span><span class="sig-name descname"><span class="pre">max_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#postprocess.max_temp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the city and day of observation with the maximum temperature. Write data to .csv .json files.</p>
+<dd><p>Find the city and day of observation with the maximum temperature. Pass for write.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -209,7 +212,10 @@ arg3 - number of threads to process data <br>
 <dl class="py function">
 <dt class="sig sig-object py" id="postprocess.min_max_diff">
 <span class="sig-prename descclassname"><span class="pre">postprocess.</span></span><span class="sig-name descname"><span class="pre">min_max_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#postprocess.min_max_diff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find city with maximum change in maximum temperature . Write data to .csv .json files.</p>
+<dd><p>Find city and day with the maximum difference between the maximum and minimum temperatures.</p>
+<blockquote>
+<div><p>Pass for write.</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -224,7 +230,7 @@ arg3 - number of threads to process data <br>
 <dl class="py function">
 <dt class="sig sig-object py" id="postprocess.min_temp">
 <span class="sig-prename descclassname"><span class="pre">postprocess.</span></span><span class="sig-name descname"><span class="pre">min_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#postprocess.min_temp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the city and day of observation with the minimum temperature. Write data to .csv .json files.</p>
+<dd><p>Find the city and day of observation with the minimum temperature. Pass for write.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -237,9 +243,13 @@ arg3 - number of threads to process data <br>
 </dd></dl>
 
 <span class="target" id="module-save"></span><p><h3>Module saving data.</h3></p>
-<dl class="py function">
-<dt class="sig sig-object py" id="save.save_graphics">
-<span class="sig-prename descclassname"><span class="pre">save.</span></span><span class="sig-name descname"><span class="pre">save_graphics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centres</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#save.save_graphics" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="save.SaveData">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">save.</span></span><span class="sig-name descname"><span class="pre">SaveData</span></span><a class="headerlink" href="#save.SaveData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save in multithreaded mode.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="save.SaveData.save_graphics">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_graphics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centres</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#save.SaveData.save_graphics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save all received charts in the catalog with the specified structure for each city.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -252,9 +262,9 @@ including arrays of weather data(historical, forecast, combine), for post-proces
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="save.save_hotels_inf">
-<span class="sig-prename descclassname"><span class="pre">save.</span></span><span class="sig-name descname"><span class="pre">save_hotels_inf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#save.save_hotels_inf" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="save.SaveData.save_hotels_inf">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_hotels_inf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#save.SaveData.save_hotels_inf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the list of hotels to .csv .</p>
 <blockquote>
 <div><p>Write (name, address, latitude, longitude) in CSV format in files containing no more than 100 entries each</p>
@@ -267,6 +277,108 @@ including arrays of weather data(historical, forecast, combine), for post-proces
 <dd class="field-even"><p>Write to .csv in [“Name”, “Geo_address”, “Latitude”, “Longitude”] format.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="save.SaveData.save_weather">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcl</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#data.Data" title="data.Data"><span class="pre">data.Data</span></a><a class="headerlink" href="#save.SaveData.save_weather" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build graphs containing day dependencies and write to files.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>minimum temperature;</p></li>
+<li><p>maximum temperature</p></li>
+</ul>
+<p>Place all the results obtained in the output directory with the following structure:
+<a href="#id1"><span class="problematic" id="id2">`</span></a>{output_folder}{country}{city}`</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dcl</strong> – Dataclass instance.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataclass instance (pass for postprocessing)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="save.SavePostProc">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">save.</span></span><span class="sig-name descname"><span class="pre">SavePostProc</span></span><a class="headerlink" href="#save.SavePostProc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save post-processing analysis data.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="save.SavePostProc.save_max_diff_max_temp">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_max_diff_max_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#save.SavePostProc.save_max_diff_max_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write data to .csv .json files.</p>
+<blockquote>
+<div><p>City with maximum change in maximum temperature.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Data format (“Country”, “City”, “Max_diff_max_temp”)</p></li>
+<li><p><strong>dir_name</strong> – the name of the directory corresponding to the type of analyzed data
+(historical data, forecast data, historical + forecast)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="save.SavePostProc.save_max_temp">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_max_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#save.SavePostProc.save_max_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write data to .csv .json files.</p>
+<blockquote>
+<div><p>City and day of observation with the maximum temperature.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Data format (“Country”, “City”, “Date”, “Max_t”)</p></li>
+<li><p><strong>dir_name</strong> – the name of the directory corresponding to the type of analyzed data
+(historical data, forecast data, historical + forecast)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="save.SavePostProc.save_min_max_diff">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_min_max_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#save.SavePostProc.save_min_max_diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write data to .csv .json files.</p>
+<blockquote>
+<div><p>City and day with the maximum difference between the maximum and minimum temperatures.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Data format (“Country”, “City”, “Date”, “Max_diff_b_max_min_temp”)</p></li>
+<li><p><strong>dir_name</strong> – the name of the directory corresponding to the type of analyzed data
+(historical data, forecast data, historical + forecast)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="save.SavePostProc.save_min_temp">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_min_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#save.SavePostProc.save_min_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write data to .csv .json files.</p>
+<blockquote>
+<div><p>City and day of observation with the minimum temperature.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Data format (“Country”, “City”, “Date”, “Min_t”)</p></li>
+<li><p><strong>dir_name</strong> – the name of the directory corresponding to the type of analyzed data
+(historical data, forecast data, historical + forecast)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <span class="target" id="module-treat"></span><p><h3>Module for receiving and processing data.</h3></p>
@@ -425,17 +537,6 @@ mid_time - curr_time-12 hours.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="weather.args_parser">
-<span class="sig-prename descclassname"><span class="pre">weather.</span></span><span class="sig-name descname"><span class="pre">args_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#weather.args_parser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse command line arguments.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Arguments.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="weather.coord_validator">
 <span class="sig-prename descclassname"><span class="pre">weather.</span></span><span class="sig-name descname"><span class="pre">coord_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#weather.coord_validator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check format and bounds of coordinate values.</p>
@@ -485,11 +586,15 @@ mid_time - curr_time-12 hours.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="weather.get_correct_df">
-<span class="sig-prename descclassname"><span class="pre">weather.</span></span><span class="sig-name descname"><span class="pre">get_correct_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.frame.DataFrame</span><a class="headerlink" href="#weather.get_correct_df" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">weather.</span></span><span class="sig-name descname"><span class="pre">get_correct_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#weather.get_correct_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the necessary values and coordinates exist and write a string to the dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Dataframe object</p>
+<dd class="field-odd"><p>Dataframe object
+no_valid_counter: counter no valid lines</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>df</p>
 </dd>
 </dl>
 </dd></dl>
